@@ -12,13 +12,6 @@ namespace Repository;
 
 public static class Program
 {
-
-    static readonly  string[] Scopes = { SheetsService.Scope.Spreadsheets };
-    static readonly string ApplicationName = "Repository";
-    static readonly string sheet = "roles";
-    static readonly string SpreadsheetId = "12PtlW4-_5wQUzXCaM89YA5chyuLuFz-vZeUirxCzDVM";
-    static readonly SheetsService service;
-
     public static void Main()
     {
         var serviceCollection = new ServiceCollection();
