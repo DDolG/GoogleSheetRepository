@@ -17,18 +17,35 @@ namespace GoogleSheetRepository.Services
 
         public void Create(string name)
         {
-            var settings = _googleSheetService.GetSettings();
-            AddSheet(settings.SheetId, name);
+            AddSheet(name);
         }
 
         public bool HavePage(string name)
         {
-            var sheet = _sheetsService.Spreadsheets.Get(name);
-            return sheet != null;
+            return CanReadSheet(name);
         }
 
-        private static void AddSheet(string spreadsheetId, string newSheetTitle)
+        private bool CanReadSheet(string name)
         {
+            var settings = _googleSheetService.GetSettings();
+            var range = $"{name}!A1";
+            SpreadsheetsResource.ValuesResource.GetRequest request =
+                _sheetsService.Spreadsheets.Values.Get(settings.SheetId, range);
+            try
+            {
+                var response = request.Execute();
+                return response != null;
+            }catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
+
+
+        private void AddSheet(string newSheetTitle)
+        {
+            var settings = _googleSheetService.GetSettings();
             Request request = new Request
             {
                 AddSheet = new AddSheetRequest
@@ -39,6 +56,18 @@ namespace GoogleSheetRepository.Services
                     }
                 }
             };
+            BatchUpdateSpreadsheetRequest batchUpdateRequest = new BatchUpdateSpreadsheetRequest
+            {
+                Requests = new List<Request> { request }
+            };
+            try
+            {
+                _sheetsService.Spreadsheets.BatchUpdate(batchUpdateRequest, settings.SheetId).Execute();
+            }
+            catch(Exception ex) 
+            {
+                Console.WriteLine($"Create page error: {ex.Message}");
+            }
         }
     }
 }

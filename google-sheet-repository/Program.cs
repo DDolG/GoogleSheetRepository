@@ -1,7 +1,4 @@
-﻿using Google.Apis.Auth.OAuth2;
-using Google.Apis.Services;
-using Google.Apis.Sheets.v4;
-using Google.Apis.Sheets.v4.Data;
+﻿using GoogleSheetRepository;
 using GoogleSheetRepository.Interfaces;
 using GoogleSheetRepository.Models;
 using GoogleSheetRepository.Services;
@@ -9,6 +6,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Repository;
+
+public class Moq
+{
+    public int Id { get; set; }
+
+    public string Name { get; set; }
+}
 
 public static class Program
 {
@@ -23,6 +27,8 @@ public static class Program
 
         var settings = new GoogleSheetSettings(); 
         serviceCollection.AddScoped<IGSService, GSService>();
+        serviceCollection.AddScoped<IGSSheetControl, IGSSheetControlService>();
+        serviceCollection.AddScoped<IGSRepository<Moq>, GSRepositoryService<Moq>>();
 
         var serviceProvider = serviceCollection.BuildServiceProvider();
 
@@ -30,6 +36,8 @@ public static class Program
         {
             var myService = scope.ServiceProvider.GetRequiredService<IGSService>();
             var test = myService.GetSettings();
+            var mworker = scope.ServiceProvider.GetRequiredService<IGSRepository<Moq>>();
+            var test2 = mworker.GetAsync();
         }
 
 

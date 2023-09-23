@@ -2,12 +2,12 @@
 {
     public interface IGSRepository<T> where T : class
     {
-        Task<T> GetAsync();
+        public Task<T> GetAsync();
 
-        Task<long> AddAsync(T item);
+        public Task<long> AddAsync(T item);
 
-        Task<bool> DeleteAsync(long itemId);
+        public Task<bool> DeleteAsync(long itemId);
 
-        Task<bool> UpdateAsync(T item);
+        public Task<bool> UpdateAsync(T item);
     }
 }

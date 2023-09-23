@@ -1,11 +1,12 @@
 ﻿using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
+using GoogleSheetRepository.Extensions;
 using GoogleSheetRepository.Interfaces;
 using GoogleSheetRepository.Models;
 
 namespace GoogleSheetRepository
 {
-    public class GSRepositoryService<T> : IGSRepository<T> where T : class
+    public class GSRepositoryService<T> : IGSRepository<T> where T : class, new()
     {
         private readonly SheetsService _sheetsService;
         private readonly IGSSheetControl _sheetControlService;
@@ -19,6 +20,7 @@ namespace GoogleSheetRepository
             _sheetsService = googleSheetService.GetService();
             _sheetControlService = sheetControlService;
             _settings = googleSheetService.GetSettings();
+            InitPage();
         }
 
         private void InitPage()
@@ -34,9 +36,9 @@ namespace GoogleSheetRepository
 
             if (CountProperty == null)
             {
-                //init
                 SetPropertyCount();
                 InitPropertyHeaders();
+                CountProperty = properties.Count();
             }
             else if(CountProperty !=  properties.Count)
             {
@@ -48,35 +50,47 @@ namespace GoogleSheetRepository
 
         private int? GetPropertyCount()
         {
-            var range = $"{_pageName}!A1";
+            var range = $"{_pageName}!{Constants.NumberOfPropertyCell}";
             SpreadsheetsResource.ValuesResource.GetRequest request =
                 _sheetsService.Spreadsheets.Values.Get(_settings.SheetId, range);
             var response = request.Execute();
-            var result = response.Values.FirstOrDefault().ToString();
+            var result = response?.Values?.FirstOrDefault()?.FirstOrDefault()?.ToString();
+            if(result == null) return null;
             int.TryParse(result, out var countClassProperties);
             return countClassProperties;
         }
 
         private void SetPropertyCount()
         {
-            var range = $"{_pageName}!A1";
+            var range = $"{_pageName}!{Constants.NumberOfPropertyCell}";
             var valueRange = new ValueRange();
-            var oblist = new List<object>() { CountProperty };
+            var genericType = typeof(T);
+            var countProperty = genericType.GetProperties().ToList().Count;
+            var oblist = new List<object>() {countProperty};
             valueRange.Values = new List<IList<object>> { oblist };
             var updateRequest = _sheetsService.Spreadsheets.Values.Update(valueRange, _settings.SheetId, range);
             updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
-            var appendReponse = updateRequest.Execute();
-            Console.WriteLine($"Write count property response: {appendReponse}");
+            try
+            {
+                var appendReponse = updateRequest.Execute();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Error write count property: {ex.Message}");
+                return;
+            }
+            Console.WriteLine($"Success write property count: {countProperty}");
         }
 
         private void InitPropertyHeaders()
         {
             var genericType = typeof(T);
             var properties = genericType.GetProperties().OrderBy(x => x.Name).ToList();
-            var range = $"{_pageName}!A2:A{properties.Count()+1}";
+            var finishRange = properties.Count().GetFinishRangeCell();
+            var range = $"{_pageName}!{Constants.HeaderPropertyStartNameCell}:{finishRange}";
             var valueRange = new ValueRange();
-            var oblList = new List<object>() { properties.Select(x => x.Name).ToList() };
-            valueRange.Values = new List<IList<object>> { oblList };
+            var oblList = properties.Select(x => x.GetPropertyDescription()).ToList();
+            valueRange.Values = new List<IList<object>> {oblList};
             var updateRequest = _sheetsService.Spreadsheets.Values.Update(valueRange, _settings.SheetId, range);
             updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
             var appendReponse = updateRequest.Execute();
@@ -84,22 +98,28 @@ namespace GoogleSheetRepository
         }
 
 
-        Task<long> IGSRepository<T>.AddAsync(T item)
+        async Task<long> IGSRepository<T>.AddAsync(T item)
         {
             throw new NotImplementedException();
         }
 
-        Task<bool> IGSRepository<T>.DeleteAsync(long itemId)
+        async Task<bool> IGSRepository<T>.DeleteAsync(long itemId)
         {
             throw new NotImplementedException();
         }
 
-        Task<T> IGSRepository<T>.GetAsync()
+        async Task<T> IGSRepository<T>.GetAsync()
         {
-            throw new NotImplementedException();
+            var range = $"{_settings.SheetName}!A2:B2";
+            SpreadsheetsResource.ValuesResource.GetRequest request =
+                _sheetsService.Spreadsheets.Values.Get(_settings.SheetId, range);
+            var response = await request.ExecuteAsync();
+            IList<IList<object>> values = response.Values;
+            T result = new T();
+            return result;
         }
 
-        Task<bool> IGSRepository<T>.UpdateAsync(T item)
+        async Task<bool> IGSRepository<T>.UpdateAsync(T item)
         {
             throw new NotImplementedException();
         }
