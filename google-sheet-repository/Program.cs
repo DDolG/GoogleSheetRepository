@@ -37,7 +37,13 @@ public static class Program
             var myService = scope.ServiceProvider.GetRequiredService<IGSService>();
             var test = myService.GetSettings();
             var mworker = scope.ServiceProvider.GetRequiredService<IGSRepository<Moq>>();
-            var test2 = mworker.GetAsync();
+            var testMoq = new Moq
+            {
+                Id = 1,
+                Name = "Test"
+            };
+            
+            var test2 = mworker.CreateAsync(testMoq);
         }
 
 
