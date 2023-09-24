@@ -3,6 +3,8 @@ using Google.Apis.Sheets.v4.Data;
 using GoogleSheetRepository.Extensions;
 using GoogleSheetRepository.Interfaces;
 using GoogleSheetRepository.Models;
+using System;
+using static Google.Apis.Requests.BatchRequest;
 
 namespace GoogleSheetRepository
 {
@@ -42,10 +44,45 @@ namespace GoogleSheetRepository
             }
             else if(CountProperty !=  properties.Count)
             {
-                //exeception dto update
+                throw new Exception("Error! Number of property changed.");
             }
 
             //check column by name
+            var headerProperties = GetPropertyFromHeader();
+            var objectProperties = properties.Select(x => new ColumnPropertyHeader
+            {
+                Name = x.Name,
+                PropertyType = x.PropertyType.ToString()
+            }).ToList();
+
+            var exceptProperties = headerProperties.Where(x=>!objectProperties.Contains(x)).ToList();
+            if (exceptProperties.Any())
+            {
+                throw new ArgumentException($"Сhanged the property name or type: {string.Join(',', exceptProperties.Select(x => x.ToString()))}");
+            }
+
+        }
+
+        private List<ColumnPropertyHeader> GetPropertyFromHeader()
+        {
+            var genericType = typeof(T);
+            var properties = genericType.GetProperties().OrderBy(x => x.Name).ToList();
+            var finishRange = properties.Count().GetFinishRangeCell();
+            var range = $"{_pageName}!{Constants.HeaderPropertyStartNameCell}:{finishRange}";
+            SpreadsheetsResource.ValuesResource.GetRequest request =
+                _sheetsService.Spreadsheets.Values.Get(_settings.SheetId, range);
+            var response = new ValueRange();
+            try
+            {
+                response = request.Execute();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error when get count property {ex.Message}");
+            }
+            var propertiHeaders = response?.Values?.FirstOrDefault();
+            var result = propertiHeaders.Select(x => x.GetColumnProperty()).ToList();
+            return result;
         }
 
         private int? GetPropertyCount()
@@ -53,7 +90,14 @@ namespace GoogleSheetRepository
             var range = $"{_pageName}!{Constants.NumberOfPropertyCell}";
             SpreadsheetsResource.ValuesResource.GetRequest request =
                 _sheetsService.Spreadsheets.Values.Get(_settings.SheetId, range);
-            var response = request.Execute();
+            var response = new ValueRange();
+            try
+            {
+                response = request.Execute();
+            }catch(Exception ex){
+                Console.WriteLine($"Error when get count property {ex.Message}");
+            }
+
             var result = response?.Values?.FirstOrDefault()?.FirstOrDefault()?.ToString();
             if(result == null) return null;
             int.TryParse(result, out var countClassProperties);
@@ -82,6 +126,8 @@ namespace GoogleSheetRepository
             Console.WriteLine($"Success write property count: {countProperty}");
         }
 
+
+
         private void InitPropertyHeaders()
         {
             var genericType = typeof(T);
@@ -96,6 +142,7 @@ namespace GoogleSheetRepository
             var appendReponse = updateRequest.Execute();
             Console.WriteLine($"Write count property response: {appendReponse}");
         }
+
 
 
         async Task<long> IGSRepository<T>.AddAsync(T item)
