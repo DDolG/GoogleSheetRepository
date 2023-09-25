@@ -43,7 +43,7 @@ public static class Program
                 Name = "Test"
             };
             
-            var test2 = mworker.CreateAsync(testMoq);
+            var test2 = mworker.AddAsync(testMoq);
         }
 
 

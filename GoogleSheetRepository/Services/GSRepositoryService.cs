@@ -5,6 +5,7 @@ using GoogleSheetRepository.Interfaces;
 using GoogleSheetRepository.Models;
 using System;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using static Google.Apis.Requests.BatchRequest;
 
 namespace GoogleSheetRepository
@@ -26,7 +27,7 @@ namespace GoogleSheetRepository
             InitPage();
         }
 
-        private void InitPage()
+        private async Task InitPage()
         {
             var genericType = typeof(T);
             _pageName = genericType.Name;
@@ -35,12 +36,12 @@ namespace GoogleSheetRepository
             if (!havePage) _sheetControlService.Create(_pageName);
 
             var properties = genericType.GetProperties().OrderBy(x=>x.Name).ToList();
-            var CountProperty = GetPropertyCountFromPage();
+            var CountProperty = await GetPropertyCountFromPageAsync();
 
             if (CountProperty == null)
             {
-                SetPropertyCount();
-                InitPropertyHeaders();
+                await SetPropertyCountAsync();
+                await InitPropertyHeadersAsync();
                 CountProperty = properties.Count();
             }
             else if(CountProperty !=  properties.Count)
@@ -49,7 +50,7 @@ namespace GoogleSheetRepository
             }
 
             //check column by name
-            var headerProperties = GetPropertyFromHeader();
+            var headerProperties = await GetPropertyFromHeaderAsync();
             var objectProperties = properties.Select(x => new ColumnPropertyHeader
             {
                 Name = x.Name,
@@ -64,10 +65,9 @@ namespace GoogleSheetRepository
 
         }
 
-        private List<ColumnPropertyHeader> GetPropertyFromHeader()
+        private async Task<List<ColumnPropertyHeader>> GetPropertyFromHeaderAsync()
         {
-            var genericType = typeof(T);
-            var properties = genericType.GetProperties().OrderBy(x => x.Name).ToList();
+            var properties = GetProperties();
             var finishRange = properties.Count().GetFinishColumn() + Constants.HeaderPropertyNameRow;
             var range = $"{_pageName}!{Constants.HeaderPropertyStartNameCell}:{finishRange}";
             SpreadsheetsResource.ValuesResource.GetRequest request =
@@ -75,7 +75,7 @@ namespace GoogleSheetRepository
             var response = new ValueRange();
             try
             {
-                response = request.Execute();
+                response = await request.ExecuteAsync();
             }
             catch (Exception ex)
             {
@@ -86,7 +86,7 @@ namespace GoogleSheetRepository
             return result;
         }
 
-        private int? GetPropertyCountFromPage()
+        private async Task<int?> GetPropertyCountFromPageAsync()
         {
             var range = $"{_pageName}!{Constants.NumberOfPropertyCell}";
             SpreadsheetsResource.ValuesResource.GetRequest request =
@@ -94,7 +94,7 @@ namespace GoogleSheetRepository
             var response = new ValueRange();
             try
             {
-                response = request.Execute();
+                response = await request.ExecuteAsync();
             }catch(Exception ex){
                 Console.WriteLine($"Error when get count property {ex.Message}");
             }
@@ -105,7 +105,7 @@ namespace GoogleSheetRepository
             return countClassProperties;
         }
 
-        private int? GetLastRowNumber()
+        private async Task<int?> GetLastRowNumberAsync()
         {
             var range = $"{_pageName}!{Constants.ColumnForSearchLastRecord}";
             SpreadsheetsResource.ValuesResource.GetRequest request =
@@ -113,7 +113,7 @@ namespace GoogleSheetRepository
             var response = new ValueRange();
             try
             {
-                response = request.Execute();
+                response = await request.ExecuteAsync();
             }
             catch (Exception ex)
             {
@@ -125,7 +125,7 @@ namespace GoogleSheetRepository
             return result;
         }
 
-        private void SetPropertyCount()
+        private async Task  SetPropertyCountAsync()
         {
             var range = $"{_pageName}!{Constants.NumberOfPropertyCell}";
             var valueRange = new ValueRange();
@@ -136,7 +136,7 @@ namespace GoogleSheetRepository
             updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
             try
             {
-                var appendReponse = updateRequest.Execute();
+                var appendReponse = await updateRequest.ExecuteAsync();
             }
             catch(Exception ex)
             {
@@ -146,7 +146,7 @@ namespace GoogleSheetRepository
             Console.WriteLine($"Success write property count: {countProperty.ToString()}");
         }
 
-        private void InitPropertyHeaders()
+        private async Task InitPropertyHeadersAsync()
         {
             var genericType = typeof(T);
             var properties = genericType.GetProperties().OrderBy(x => x.Name).ToList();
@@ -160,7 +160,7 @@ namespace GoogleSheetRepository
             UpdateValuesResponse appendReponse = new UpdateValuesResponse();
             try
             {
-                appendReponse = updateRequest.Execute();
+                appendReponse = await updateRequest.ExecuteAsync();
             }
             catch (Exception ex)
             {
@@ -169,9 +169,9 @@ namespace GoogleSheetRepository
              Console.WriteLine($"Write count property response: {appendReponse.ToString()}");
         }
 
-        async Task<long> IGSRepository<T>.CreateAsync(T item)
+        public async Task<long> AddAsync(T item)
         {
-            var lastRowNumber = GetLastRowNumber();
+            var lastRowNumber = await GetLastRowNumberAsync();
             var numberRowForSave = lastRowNumber + 1;
             var properties = GetProperties();
             var finishRange = properties.Count().GetFinishColumn() + numberRowForSave.ToString();
@@ -184,7 +184,7 @@ namespace GoogleSheetRepository
             AppendValuesResponse appendReponse = new AppendValuesResponse();
             try
             {
-                appendReponse = appendRequest.Execute();
+                appendReponse = await appendRequest.ExecuteAsync();
             }
             catch (Exception ex)
             {
@@ -205,6 +205,8 @@ namespace GoogleSheetRepository
         {
             throw new NotImplementedException();
         }
+
+        
 
         async Task<T> IGSRepository<T>.ReadAsync()
         {

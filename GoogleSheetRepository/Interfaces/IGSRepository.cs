@@ -4,7 +4,7 @@
     {
         public Task<T> ReadAsync();
 
-        public Task<long> CreateAsync(T item);
+        public Task<long> AddAsync(T item);
 
         public Task<bool> DeleteAsync(long itemId);
 
