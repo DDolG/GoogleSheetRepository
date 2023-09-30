@@ -6,7 +6,7 @@
 
         public Task<long> AddAsync(T item);
 
-        public Task<bool> DeleteAsync(long itemId);
+        public Task<bool> DeleteAsync(T item);
 
         public Task<bool> UpdateAsync(T oldItem, T newItem);
     }

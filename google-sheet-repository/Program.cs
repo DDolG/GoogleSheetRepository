@@ -57,6 +57,8 @@ public static class Program
             var test3 = Task.Run(async () => await mworker.UpdateAsync(updateOld, updateTestObject));
             Console.WriteLine($"Result update value: {test3.Result}");
 
+            var test4 = Task.Run(async () => await mworker.DeleteAsync(test2.Result[2]));
+            Console.WriteLine($"Result delete row: {test4.Result}");
         }
 
 

@@ -69,5 +69,19 @@ namespace GoogleSheetRepository.Services
                 Console.WriteLine($"Create page error: {ex.Message}");
             }
         }
+
+        public int GetSheetId(string spreadsheetId, string sheetName)
+        {
+            var spreadsheet = _sheetsService.Spreadsheets.Get(spreadsheetId).Execute();
+
+            var sheet = spreadsheet.Sheets.FirstOrDefault(s => s.Properties.Title == sheetName);
+
+            if (sheet != null)
+            {
+                return sheet.Properties.SheetId ?? 0;
+            }
+
+            throw new InvalidOperationException($"Sheet '{sheetName}' not found in the spreadsheet.");
+        }
     }
 }

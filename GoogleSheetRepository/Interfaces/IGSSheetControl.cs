@@ -5,5 +5,7 @@
         bool HavePage(string name);
 
         void Create(string name);
+
+        int GetSheetId(string spreadsheetId, string sheetName);
     }
 }

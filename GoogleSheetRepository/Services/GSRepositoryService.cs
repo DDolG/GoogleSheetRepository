@@ -198,9 +198,44 @@ namespace GoogleSheetRepository
         }
 
 
-        public async Task<bool> DeleteAsync(long itemId)
+        private async Task<bool> DeleteRow(int rowIndex)
         {
-            throw new NotImplementedException();
+            var request = new Request
+            {
+                DeleteDimension = new DeleteDimensionRequest
+                {
+                    Range = new DimensionRange
+                    {
+                        SheetId = _sheetControlService.GetSheetId(_settings.SheetId, _pageName),
+                        Dimension = "ROWS",
+                        StartIndex = rowIndex-1,
+                        EndIndex = rowIndex
+                    }
+                }
+            };
+            var batchUpdateRequest = new BatchUpdateSpreadsheetRequest
+            {
+                Requests = new List<Request> { request }
+            };
+            try
+            {
+                _sheetsService.Spreadsheets.BatchUpdate(batchUpdateRequest, _settings.SheetId).Execute();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Error try delete row with index: {rowIndex}");
+                throw;
+            }
+
+            return true;
+        }
+
+
+        public async Task<bool> DeleteAsync(T item)
+        {
+            var deleteRowIndex = await GetRowNumber(item);
+            var result = await DeleteRow(deleteRowIndex);
+            return result;
         }
         
         public async Task<List<T>> GetAsync()
