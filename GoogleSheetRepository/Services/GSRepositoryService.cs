@@ -3,9 +3,7 @@ using Google.Apis.Sheets.v4.Data;
 using GoogleSheetRepository.Extensions;
 using GoogleSheetRepository.Interfaces;
 using GoogleSheetRepository.Models;
-using System;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using static Google.Apis.Requests.BatchRequest;
 
 namespace GoogleSheetRepository
@@ -89,16 +87,14 @@ namespace GoogleSheetRepository
         private async Task<int?> GetPropertyCountFromPageAsync()
         {
             var range = $"{_pageName}!{Constants.NumberOfPropertyCell}";
-            SpreadsheetsResource.ValuesResource.GetRequest request =
-                _sheetsService.Spreadsheets.Values.Get(_settings.SheetId, range);
+            var request = _sheetsService.Spreadsheets.Values.Get(_settings.SheetId, range);
             var response = new ValueRange();
             try
             {
                 response = await request.ExecuteAsync();
             }catch(Exception ex){
-                Console.WriteLine($"Error when get count property {ex.Message}");
+                Console.WriteLine($"Error when get property headers: {ex.Message}");
             }
-
             var result = response?.Values?.FirstOrDefault()?.FirstOrDefault()?.ToString();
             if(result == null) return null;
             int.TryParse(result, out var countClassProperties);
@@ -108,8 +104,7 @@ namespace GoogleSheetRepository
         private async Task<int?> GetLastRowNumberAsync()
         {
             var range = $"{_pageName}!{Constants.ColumnForSearchLastRecord}";
-            SpreadsheetsResource.ValuesResource.GetRequest request =
-                _sheetsService.Spreadsheets.Values.Get(_settings.SheetId, range);
+            var request = _sheetsService.Spreadsheets.Values.Get(_settings.SheetId, range);
             var response = new ValueRange();
             try
             {
@@ -120,7 +115,7 @@ namespace GoogleSheetRepository
                 Console.WriteLine($"Error when get count property {ex.Message}");
             }
 
-            var result = response?.Values?.FirstOrDefault().Count;
+            var result = response?.Values?.Count;
             if (result == null) return null;
             return result;
         }
@@ -201,25 +196,37 @@ namespace GoogleSheetRepository
         }
 
 
-        async Task<bool> IGSRepository<T>.DeleteAsync(long itemId)
+        public async Task<bool> DeleteAsync(long itemId)
         {
             throw new NotImplementedException();
         }
-
         
-
-        async Task<T> IGSRepository<T>.ReadAsync()
+        public async Task<List<T>> GetAsync()
         {
-            var range = $"{_pageName}!A2:B2";
-            SpreadsheetsResource.ValuesResource.GetRequest request =
-                _sheetsService.Spreadsheets.Values.Get(_settings.SheetId, range);
-            var response = await request.ExecuteAsync();
-            IList<IList<object>> values = response.Values;
-            T result = new T();
-            return result;
+            var lastRow = await GetLastRowNumberAsync();
+            var properties = GetProperties();
+            var finishRange = properties.Count().GetFinishColumn() + lastRow.ToString();
+            var range = $"{_pageName}!{Constants.ColumnForBeginWriteData}{Constants.RowForBeginWriteData}:{finishRange}";
+            var request = _sheetsService.Spreadsheets.Values.Get(_settings.SheetId, range);
+            var response = new ValueRange();
+            try
+            {
+                response = await request.ExecuteAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error when read data range {range} message: {ex.Message}");
+            }
+            if (!response.Values.Any())
+            {
+                throw new ArgumentOutOfRangeException("Readed range is empty");
+            };
+            var objects = response.Values.First().ToList();
+            var rows = response.Values.Select(x=>x.ToList().GetObjectFromProperty<T>());
+            return rows.ToList();
         }
 
-        async Task<bool> IGSRepository<T>.UpdateAsync(T item)
+        public async Task<bool> UpdateAsync(T item)
         {
             throw new NotImplementedException();
         }

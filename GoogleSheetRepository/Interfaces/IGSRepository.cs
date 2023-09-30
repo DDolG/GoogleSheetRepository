@@ -2,7 +2,7 @@
 {
     public interface IGSRepository<T> where T : class
     {
-        public Task<T> ReadAsync();
+        public Task<List<T>> GetAsync();
 
         public Task<long> AddAsync(T item);
 
