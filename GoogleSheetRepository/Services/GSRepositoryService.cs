@@ -3,12 +3,14 @@ using Google.Apis.Sheets.v4.Data;
 using GoogleSheetRepository.Extensions;
 using GoogleSheetRepository.Interfaces;
 using GoogleSheetRepository.Models;
+using System;
 using System.Reflection;
+using System.Text.Json;
 using static Google.Apis.Requests.BatchRequest;
 
 namespace GoogleSheetRepository
 {
-    public class GSRepositoryService<T> : IGSRepository<T> where T : class, new()
+    public class GSRepositoryService<T> : IGSRepository<T> where T : class, IEquatable<T>, new()
     {
         private readonly SheetsService _sheetsService;
         private readonly IGSSheetControl _sheetControlService;
@@ -226,9 +228,62 @@ namespace GoogleSheetRepository
             return rows.ToList();
         }
 
-        public async Task<bool> UpdateAsync(T item)
+        public async Task<int> GetRowNumber(T item)
         {
-            throw new NotImplementedException();
+            var values = await GetAsync();
+            var countRow = 0;
+            var indexes = new List<int>();
+            foreach (var row in values)
+            {
+                countRow++;
+                if (row.Equals(item))
+                {
+                    indexes.Add(countRow);
+                }
+            }
+
+            if (indexes.Count() > 1)
+            {
+                throw new ArgumentException($"More than two search results for {JsonSerializer.Serialize(item)}");
+            }
+
+            if (!indexes.Any())
+            {
+                throw new ArgumentException($"No search result for {JsonSerializer.Serialize(item)}");
+            }
+
+            return indexes.First() + Constants.RowHeaderNumber;
+        }
+
+        private async Task<bool> UpdateRow(int rowNumber, T item)
+        {
+            var properties = GetProperties();
+            var finishRange = properties.Count().GetFinishColumn() + rowNumber.ToString();
+            var range = $"{_pageName}!{Constants.ColumnForBeginWriteData}{rowNumber}:{finishRange}";
+            var valueRange = new ValueRange();
+            var oblList = properties.Select(x => (object)x.GetValue(item)).ToList();
+            valueRange.Values = new List<IList<object>> { oblList };
+            var request = _sheetsService.Spreadsheets.Values.Update(valueRange, _settings.SheetId, range);
+            request.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
+            var appendReponse = new UpdateValuesResponse();
+            try
+            {
+                appendReponse = await request.ExecuteAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException($"Error try update record: {ex.Message}");
+            }
+            Console.WriteLine($"Succes update record response: {appendReponse.ToString()}");
+            return true;
+        }
+
+
+        public async Task<bool> UpdateAsync(T oldItem,T item)
+        {
+            var updateItemIndex = await GetRowNumber(oldItem);   
+            var result = await UpdateRow(updateItemIndex, item);
+            return result;
         }
     }
 }

@@ -8,6 +8,6 @@
 
         public Task<bool> DeleteAsync(long itemId);
 
-        public Task<bool> UpdateAsync(T item);
+        public Task<bool> UpdateAsync(T oldItem, T newItem);
     }
 }

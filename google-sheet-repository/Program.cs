@@ -7,11 +7,16 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Repository;
 
-public class Moq
+public class Moq : IEquatable<Moq>
 {
     public int Id { get; set; }
 
     public string Name { get; set; }
+
+    public bool Equals(Moq? other)
+    {
+        return Id == other.Id && Name == other.Name;
+    }
 }
 
 public static class Program
@@ -43,8 +48,14 @@ public static class Program
                 Name = "Test1"
             };
             
-            var test2 = mworker.GetAsync();
+            var test2 = Task.Run(async () => await mworker.GetAsync());            
+            var updateOld = test2.Result.First();
+            var updateTestObject = new Moq();
+            updateTestObject.Id = updateOld.Id + 1;
+            updateTestObject.Name = updateOld.Name + updateTestObject.Id;
 
+            var test3 = Task.Run(async () => await mworker.UpdateAsync(updateOld, updateTestObject));
+            Console.WriteLine($"Result update value: {test3.Result}");
 
         }
 
@@ -52,5 +63,7 @@ public static class Program
         Console.ReadKey();
     }
     
+
+
     
 }
