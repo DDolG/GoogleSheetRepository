@@ -197,40 +197,6 @@ namespace GoogleSheetRepository
             return genericType.GetProperties().OrderBy(x => x.Name).ToList();
         }
 
-
-        private async Task<bool> DeleteRow(int rowIndex)
-        {
-            var request = new Request
-            {
-                DeleteDimension = new DeleteDimensionRequest
-                {
-                    Range = new DimensionRange
-                    {
-                        SheetId = _sheetControlService.GetSheetId(_settings.SheetId, _pageName),
-                        Dimension = "ROWS",
-                        StartIndex = rowIndex-1,
-                        EndIndex = rowIndex
-                    }
-                }
-            };
-            var batchUpdateRequest = new BatchUpdateSpreadsheetRequest
-            {
-                Requests = new List<Request> { request }
-            };
-            try
-            {
-                _sheetsService.Spreadsheets.BatchUpdate(batchUpdateRequest, _settings.SheetId).Execute();
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine($"Error try delete row with index: {rowIndex}");
-                throw;
-            }
-
-            return true;
-        }
-
-
         public async Task<bool> DeleteAsync(T item)
         {
             var deleteRowIndex = await GetRowNumber(item);
@@ -263,6 +229,35 @@ namespace GoogleSheetRepository
             return rows.ToList();
         }
 
+        public async Task<List<T>> GetAsync(int skip, int take)
+        {
+            skip += Constants.RowHeaderNumber;
+            var lastRow = await GetLastRowNumberAsync();
+            var properties = GetProperties();
+            var beginData = skip > lastRow ? lastRow : skip;
+            var endData = (skip + take) > lastRow ? lastRow : (skip + take - 1);
+            var finishRange = properties.Count().GetFinishColumn() + endData.ToString();
+            var range = $"{_pageName}!{Constants.ColumnForBeginWriteData}{beginData}:{finishRange}";
+            var request = _sheetsService.Spreadsheets.Values.Get(_settings.SheetId, range);
+            var response = new ValueRange();
+            try
+            {
+                response = await request.ExecuteAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error when read data range {range} message: {ex.Message}");
+            }
+            if (!response.Values.Any())
+            {
+                throw new ArgumentOutOfRangeException("Readed range is empty");
+            };
+            var rows = response.Values.First().ToList();
+            var objects = response.Values.Select(x => x.ToList().GetObjectFromProperty<T>());
+            return objects.ToList();
+        }
+
+
         public async Task<int> GetRowNumber(T item)
         {
             var values = await GetAsync();
@@ -289,6 +284,13 @@ namespace GoogleSheetRepository
 
             return indexes.First() + Constants.RowHeaderNumber;
         }
+        
+        public async Task<bool> UpdateAsync(T oldItem,T item)
+        {
+            var updateItemIndex = await GetRowNumber(oldItem);   
+            var result = await UpdateRow(updateItemIndex, item);
+            return result;
+        }
 
         private async Task<bool> UpdateRow(int rowNumber, T item)
         {
@@ -314,11 +316,36 @@ namespace GoogleSheetRepository
         }
 
 
-        public async Task<bool> UpdateAsync(T oldItem,T item)
+        private async Task<bool> DeleteRow(int rowIndex)
         {
-            var updateItemIndex = await GetRowNumber(oldItem);   
-            var result = await UpdateRow(updateItemIndex, item);
-            return result;
+            var request = new Request
+            {
+                DeleteDimension = new DeleteDimensionRequest
+                {
+                    Range = new DimensionRange
+                    {
+                        SheetId = _sheetControlService.GetSheetId(_settings.SheetId, _pageName),
+                        Dimension = "ROWS",
+                        StartIndex = rowIndex - 1,
+                        EndIndex = rowIndex
+                    }
+                }
+            };
+            var batchUpdateRequest = new BatchUpdateSpreadsheetRequest
+            {
+                Requests = new List<Request> { request }
+            };
+            try
+            {
+                _sheetsService.Spreadsheets.BatchUpdate(batchUpdateRequest, _settings.SheetId).Execute();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error when try delete row with index: {rowIndex}");
+                throw;
+            }
+
+            return true;
         }
     }
 }

@@ -4,6 +4,8 @@ using GoogleSheetRepository.Models;
 using GoogleSheetRepository.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Text.Json;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Repository;
 
@@ -57,8 +59,11 @@ public static class Program
             var test3 = Task.Run(async () => await mworker.UpdateAsync(updateOld, updateTestObject));
             Console.WriteLine($"Result update value: {test3.Result}");
 
-            var test4 = Task.Run(async () => await mworker.DeleteAsync(test2.Result[2]));
-            Console.WriteLine($"Result delete row: {test4.Result}");
+            //var test4 = Task.Run(async () => await mworker.DeleteAsync(test2.Result[2]));
+            //Console.WriteLine($"Result delete row: {test4.Result}");
+
+            var test5 = Task.Run(async () => await mworker.GetAsync(1, 1));
+            Console.WriteLine($"Result row read: {JsonSerializer.Serialize(test5.Result)}");
         }
 
 
