@@ -41,14 +41,14 @@ namespace GoogleSheetRepository.Helpers
             throw new InvalidOperationException($"Sheet '{_sheetName}' not found in the spreadsheet.");
         }
 
-        public async Task<int?> GetLastRowNumberAsync()
+        public int? GetLastRowNumber()
         {
             var range = $"{_sheetName}!{Constants.ColumnForSearchLastRecord}";
             var request = _sheetsService.Spreadsheets.Values.Get(_settings.SheetId, range);
             var response = new ValueRange();
             try
             {
-                response = await request.ExecuteAsync();
+                response = request.Execute();
             }
             catch (Exception ex)
             {

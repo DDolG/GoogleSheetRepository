@@ -8,6 +8,6 @@
 
         int GetSheetId();
 
-        Task<int?> GetLastRowNumberAsync();
+        int? GetLastRowNumber();
     }
 }

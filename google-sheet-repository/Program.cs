@@ -66,20 +66,20 @@ public static class Program
                 Name = "Test1"
             };
             
-            var test2 = Task.Run(async () => await mworker.GetAsync());            
-            var updateOld = test2.Result.First();
+            var test2 = mworker.Get();            
+            var updateOld = test2.First();
             var updateTestObject = new Moq();
             updateTestObject.Id = updateOld.Id + 1;
             updateTestObject.Name = updateOld.Name + updateTestObject.Id;
 
-            var test3 = Task.Run(async () => await mworker.UpdateAsync(updateOld, updateTestObject));
-            Console.WriteLine($"Result update value: {test3.Result}");
+            var test3 = mworker.Update(updateOld, updateTestObject);
+            Console.WriteLine($"Result update value: {test3}");
 
             //var test4 = Task.Run(async () => await mworker.DeleteAsync(test2.Result[2]));
             //Console.WriteLine($"Result delete row: {test4.Result}");
 
-            var test5 = Task.Run(async () => await mworker.GetAsync(1, 1));
-            Console.WriteLine($"Result row read: {JsonSerializer.Serialize(test5.Result)}");
+            var test5 =  mworker.Get(1, 1);
+            Console.WriteLine($"Result row read: {JsonSerializer.Serialize(test5)}");
 
             var mworker2 = scope.ServiceProvider.GetRequiredService<IRepository<Moq2>>();
             var testMoq2 = new Moq2
@@ -88,7 +88,7 @@ public static class Program
                 Name = "Test Moq2",
                 Price = 2.8M,
             };
-            mworker2.AddAsync(testMoq2);
+            mworker2.Add(testMoq2);
         }
 
 

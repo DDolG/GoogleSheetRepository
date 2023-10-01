@@ -31,18 +31,18 @@ namespace GoogleSheetRepository
             InitRepository();
         }
 
-        private async Task InitRepository()
+        private void InitRepository()
         {
 
             var havePage = _sheetHelper.HavePage();
             if (!havePage) _sheetHelper.Create();
  
-            var CountProperty = await _headerHelper.GetPropertyCountFromPageAsync();
+            var CountProperty = _headerHelper.GetPropertyCountFromPage();
 
             if (CountProperty == null)
             {
-                await _headerHelper.SetPropertyCountAsync();
-                await _headerHelper.InitPropertyHeadersAsync();
+                _headerHelper.SetPropertyCount();
+                _headerHelper.InitPropertyHeaders();
                 CountProperty = _properties.Count();
             }
             else if(CountProperty !=  _properties.Count)
@@ -51,7 +51,7 @@ namespace GoogleSheetRepository
             }
 
             //check column by name
-            var headerProperties = await _headerHelper.GetPropertyFromHeaderAsync();
+            var headerProperties = _headerHelper.GetPropertyFromHeader();
             var objectProperties = _properties.Select(x => new ColumnPropertyHeader
             {
                 Name = x.Name,
@@ -66,9 +66,9 @@ namespace GoogleSheetRepository
 
         }
         
-        public async Task<long> AddAsync(T item)
+        public long Add(T item)
         {
-            var lastRowNumber = await _sheetHelper.GetLastRowNumberAsync();
+            var lastRowNumber = _sheetHelper.GetLastRowNumber();
             var numberRowForSave = lastRowNumber + 1;
             var finishRange = _properties.Count().GetFinishColumn() + numberRowForSave.ToString();
             var range = $"{_sheetName}!{Constants.ColumnForBeginWriteData}{numberRowForSave}:{finishRange}";
@@ -80,7 +80,7 @@ namespace GoogleSheetRepository
             AppendValuesResponse appendReponse = new AppendValuesResponse();
             try
             {
-                appendReponse = await appendRequest.ExecuteAsync();
+                appendReponse = appendRequest.Execute();
             }
             catch (Exception ex)
             {
@@ -90,29 +90,23 @@ namespace GoogleSheetRepository
             return (long)numberRowForSave;
         }
 
-        private List<PropertyInfo> GetProperties()
+        public bool Delete(T item)
         {
-            var genericType = typeof(T);
-            return genericType.GetProperties().OrderBy(x => x.Name).ToList();
-        }
-
-        public async Task<bool> DeleteAsync(T item)
-        {
-            var deleteRowIndex = await GetRowNumber(item);
-            var result = await DeleteRow(deleteRowIndex);
+            var deleteRowIndex = GetRowNumber(item);
+            var result = DeleteRow(deleteRowIndex);
             return result;
         }
         
-        public async Task<List<T>> GetAsync()
+        public List<T> Get()
         {
-            var lastRow = await _sheetHelper.GetLastRowNumberAsync();
+            var lastRow = _sheetHelper.GetLastRowNumber();
             var finishRange = _properties.Count().GetFinishColumn() + lastRow.ToString();
             var range = $"{_sheetName}!{Constants.ColumnForBeginWriteData}{Constants.RowForBeginWriteData}:{finishRange}";
             var request = _sheetsService.Spreadsheets.Values.Get(_settings.SheetId, range);
             var response = new ValueRange();
             try
             {
-                response = await request.ExecuteAsync();
+                response = request.Execute();
             }
             catch (Exception ex)
             {
@@ -127,10 +121,10 @@ namespace GoogleSheetRepository
             return rows.ToList();
         }
 
-        public async Task<List<T>> GetAsync(int skip, int take)
+        public List<T> Get(int skip, int take)
         {
             skip += Constants.RowHeaderNumber;
-            var lastRow = await _sheetHelper.GetLastRowNumberAsync();
+            var lastRow = _sheetHelper.GetLastRowNumber();
             var beginData = skip > lastRow ? lastRow : skip;
             var endData = (skip + take) > lastRow ? lastRow : (skip + take - 1);
             var finishRange = _properties.Count().GetFinishColumn() + endData.ToString();
@@ -139,7 +133,7 @@ namespace GoogleSheetRepository
             var response = new ValueRange();
             try
             {
-                response = await request.ExecuteAsync();
+                response = request.Execute();
             }
             catch (Exception ex)
             {
@@ -155,9 +149,9 @@ namespace GoogleSheetRepository
         }
 
 
-        public async Task<int> GetRowNumber(T item)
+        public int GetRowNumber(T item)
         {
-            var values = await GetAsync();
+            var values = Get();
             var countRow = 0;
             var indexes = new List<int>();
             foreach (var row in values)
@@ -182,14 +176,14 @@ namespace GoogleSheetRepository
             return indexes.First() + Constants.RowHeaderNumber;
         }
         
-        public async Task<bool> UpdateAsync(T oldItem,T item)
+        public bool Update(T oldItem,T item)
         {
-            var updateItemIndex = await GetRowNumber(oldItem);   
-            var result = await UpdateRow(updateItemIndex, item);
+            var updateItemIndex = GetRowNumber(oldItem);   
+            var result = UpdateRow(updateItemIndex, item);
             return result;
         }
 
-        private async Task<bool> UpdateRow(int rowNumber, T item)
+        private bool UpdateRow(int rowNumber, T item)
         {
             var finishRange = _properties.Count().GetFinishColumn() + rowNumber.ToString();
             var range = $"{_sheetName}!{Constants.ColumnForBeginWriteData}{rowNumber}:{finishRange}";
@@ -201,7 +195,7 @@ namespace GoogleSheetRepository
             var appendReponse = new UpdateValuesResponse();
             try
             {
-                appendReponse = await request.ExecuteAsync();
+                appendReponse = request.Execute();
             }
             catch (Exception ex)
             {
@@ -212,7 +206,7 @@ namespace GoogleSheetRepository
         }
 
 
-        private async Task<bool> DeleteRow(int rowIndex)
+        private bool DeleteRow(int rowIndex)
         {
             var request = new Request
             {

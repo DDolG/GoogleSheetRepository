@@ -24,14 +24,14 @@ namespace GoogleSheetRepository.Helpers
             _properties = properties;
         }
 
-        public async Task<int?> GetPropertyCountFromPageAsync()
+        public int? GetPropertyCountFromPage()
         {
             var range = $"{_sheetName}!{Constants.NumberOfPropertyCell}";
             var request = _sheetsService.Spreadsheets.Values.Get(_settings.SheetId, range);
             var response = new ValueRange();
             try
             {
-                response = await request.ExecuteAsync();
+                response = request.Execute();
             }
             catch (Exception ex)
             {
@@ -43,7 +43,7 @@ namespace GoogleSheetRepository.Helpers
             return countClassProperties;
         }
 
-        public async Task<List<ColumnPropertyHeader>> GetPropertyFromHeaderAsync()
+        public List<ColumnPropertyHeader> GetPropertyFromHeader()
         {
             var finishRange = _properties.Count().GetFinishColumn() + Constants.HeaderPropertyNameRow;
             var range = $"{_sheetName}!{Constants.HeaderPropertyStartNameCell}:{finishRange}";
@@ -51,7 +51,7 @@ namespace GoogleSheetRepository.Helpers
             var response = new ValueRange();
             try
             {
-                response = await request.ExecuteAsync();
+                response = request.Execute();
             }
             catch (Exception ex)
             {
@@ -62,7 +62,7 @@ namespace GoogleSheetRepository.Helpers
             return result;
         }
 
-        public async Task InitPropertyHeadersAsync()
+        public void InitPropertyHeaders()
         {
             var finishRange = _properties.Count().GetFinishColumn() + Constants.HeaderPropertyNameRow;
             var range = $"{_sheetName}!{Constants.HeaderPropertyStartNameCell}:{finishRange}";
@@ -74,7 +74,7 @@ namespace GoogleSheetRepository.Helpers
             UpdateValuesResponse appendReponse = new UpdateValuesResponse();
             try
             {
-                appendReponse = await updateRequest.ExecuteAsync();
+                appendReponse = updateRequest.Execute();
             }
             catch (Exception ex)
             {
@@ -83,7 +83,7 @@ namespace GoogleSheetRepository.Helpers
             Console.WriteLine($"Write count property response: {appendReponse.ToString()}");
         }
 
-        public async Task SetPropertyCountAsync()
+        public void SetPropertyCount()
         {
             var range = $"{_sheetName}!{Constants.NumberOfPropertyCell}";
             var valueRange = new ValueRange();
@@ -94,7 +94,7 @@ namespace GoogleSheetRepository.Helpers
             updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
             try
             {
-                var appendReponse = await updateRequest.ExecuteAsync();
+                var appendReponse = updateRequest.Execute();
             }
             catch (Exception ex)
             {

@@ -4,12 +4,12 @@ namespace GoogleSheetRepository.Interfaces
 {
     public interface IHeader
     {
-        Task<List<ColumnPropertyHeader>> GetPropertyFromHeaderAsync();
+        List<ColumnPropertyHeader> GetPropertyFromHeader();
 
-        Task<int?> GetPropertyCountFromPageAsync();
+        int? GetPropertyCountFromPage();
 
-        Task SetPropertyCountAsync();
+        void SetPropertyCount();
 
-        Task InitPropertyHeadersAsync();
+        void InitPropertyHeaders();
     }
 }

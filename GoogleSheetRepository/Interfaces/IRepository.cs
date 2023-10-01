@@ -2,14 +2,14 @@
 {
     public interface IRepository<T> where T : class
     {
-        Task<List<T>> GetAsync();
+        List<T> Get();
 
-        Task<List<T>> GetAsync(int skip, int take);
+        List<T> Get(int skip, int take);
 
-        Task<long> AddAsync(T item);
+        long Add(T item);
 
-        Task<bool> DeleteAsync(T item);
+        bool Delete(T item);
 
-        Task<bool> UpdateAsync(T oldItem, T newItem);
+        bool Update(T oldItem, T newItem);
     }
 }
