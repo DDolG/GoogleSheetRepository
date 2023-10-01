@@ -3,9 +3,9 @@ using System.Text.RegularExpressions;
 
 namespace GoogleSheetRepository.Extensions
 {
-    internal static class ObjectExtensions
+    public static class ObjectExtensions
     {
-        internal static ColumnPropertyHeader GetColumnProperty(this object headerCell)
+        public static ColumnPropertyHeader GetColumnProperty(this object headerCell)
         {
             var header = headerCell as string;
             var match = Regex.Match(header, @"^(.*?)\[");

@@ -2,9 +2,9 @@
 
 namespace GoogleSheetRepository.Extensions
 {
-    internal static class PropertyExtensions
+    public static class PropertyExtensions
     {
-        internal static object GetPropertyDescription(this PropertyInfo property)
+        public static object GetPropertyDescription(this PropertyInfo property)
         {
             var description = $"{property.Name}[{property.PropertyType}]";
             return (object)description;

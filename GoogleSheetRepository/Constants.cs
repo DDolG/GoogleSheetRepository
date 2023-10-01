@@ -10,5 +10,7 @@
         public static string HeaderPropertyStartNameCell { get; } = "B1";
         public static string HeaderPropertyNameRow { get; } = "1";
         public static int BeginPropertyHeader { get; } = 1;
+        public static int MaxLetterNumber {get;} = 26;
+        public static int MinLetterNumber { get; } = 1;
     }
 }

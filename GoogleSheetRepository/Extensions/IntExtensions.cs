@@ -1,24 +1,35 @@
 ﻿namespace GoogleSheetRepository.Extensions
 {
-    internal static class IntExtensions
+    public  static class IntExtensions
     {
-        internal static string GetFinishColumn(this int propertyNumber)
+        public static string GetFinishColumn(this int propertyNumber)
         {
             var propertyBeginColumn = propertyNumber + Constants.BeginPropertyHeader;
-            var letter = ConvertToLetter(propertyBeginColumn);
-            return letter.ToString();
+            var letters = ConvertToColumnAddress(propertyBeginColumn);
+            return letters.ToString();
         }
-
-        
-        public static char ConvertToLetter(int number)
+                
+        public static string ConvertToColumnAddress(this int number)
         {
-            if (number < 1 || number > 26)
+            var result = string.Empty;
+            while((number / Constants.MaxLetterNumber > 0))
+            {
+                var tmp = number / Constants.MaxLetterNumber;
+                result += tmp < Constants.MaxLetterNumber ? ConvertToLetter(tmp) : ConvertToColumnAddress(tmp);
+                number -= tmp * Constants.MaxLetterNumber;
+            }
+            result += ConvertToLetter(number);
+            return result;
+        }
+                
+        private static char ConvertToLetter(int number)
+        {
+            if (number < Constants.MinLetterNumber || number > Constants.MaxLetterNumber)
             {
                 throw new ArgumentOutOfRangeException(nameof(number), "Number must be between 1 and 26.");
             }
-            // ASCII value of 'A' is 65, so we can convert the number to the corresponding character.
             return (char)(number + 64);
         }
-        
+
     }
 }
