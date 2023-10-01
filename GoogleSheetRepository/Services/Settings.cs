@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace GoogleSheetRepository.Services
 {
-    public class GSService : IGSService
+    public class Settings : ISettings
     {
         private readonly GoogleSheetSettings _settings;
         private readonly SheetsService _service;
@@ -16,7 +16,7 @@ namespace GoogleSheetRepository.Services
         private readonly GoogleCredential _credential;
         private readonly IConfiguration _configuration;
 
-        public GSService(IConfiguration configuration)
+        public Settings(IConfiguration configuration)
         {
             _configuration = configuration;
  

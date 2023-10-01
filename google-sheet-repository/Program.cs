@@ -1,4 +1,5 @@
 ﻿using GoogleSheetRepository;
+using GoogleSheetRepository.Helpers;
 using GoogleSheetRepository.Interfaces;
 using GoogleSheetRepository.Models;
 using GoogleSheetRepository.Services;
@@ -33,17 +34,16 @@ public static class Program
         serviceCollection.AddSingleton<IConfiguration>(configuration);
 
         var settings = new GoogleSheetSettings(); 
-        serviceCollection.AddScoped<IGSService, GSService>();
-        serviceCollection.AddScoped<IGSSheetControl, IGSSheetControlService>();
-        serviceCollection.AddScoped<IGSRepository<Moq>, GSRepositoryService<Moq>>();
+        serviceCollection.AddScoped<ISettings, Settings>();
+        serviceCollection.AddScoped<IRepository<Moq>, Repository<Moq>>();
 
         var serviceProvider = serviceCollection.BuildServiceProvider();
 
         using (var scope = serviceProvider.CreateScope())
         {
-            var myService = scope.ServiceProvider.GetRequiredService<IGSService>();
+            var myService = scope.ServiceProvider.GetRequiredService<ISettings>();
             var test = myService.GetSettings();
-            var mworker = scope.ServiceProvider.GetRequiredService<IGSRepository<Moq>>();
+            var mworker = scope.ServiceProvider.GetRequiredService<IRepository<Moq>>();
             var testMoq = new Moq
             {
                 Id = 2,

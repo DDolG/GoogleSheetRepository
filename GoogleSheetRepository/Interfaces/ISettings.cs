@@ -3,7 +3,7 @@ using GoogleSheetRepository.Models;
 
 namespace GoogleSheetRepository.Interfaces
 {
-    public interface IGSService
+    public interface ISettings
     {
         SheetsService GetService();
 
