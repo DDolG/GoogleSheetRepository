@@ -22,6 +22,21 @@ public class Moq : IEquatable<Moq>
     }
 }
 
+public class Moq2 : IEquatable<Moq2>
+{
+    public int Id { get; set; }
+
+    public string Name { get; set; }
+
+    public decimal Price { get; set; }
+
+    public bool Equals(Moq2? other)
+    {
+        return Id == other.Id && Name == other.Name;
+    }
+}
+
+
 public static class Program
 {
     public static void Main()
@@ -36,6 +51,7 @@ public static class Program
         var settings = new GoogleSheetSettings(); 
         serviceCollection.AddScoped<ISettings, Settings>();
         serviceCollection.AddScoped<IRepository<Moq>, Repository<Moq>>();
+        serviceCollection.AddScoped<IRepository<Moq2>, Repository<Moq2>>();
 
         var serviceProvider = serviceCollection.BuildServiceProvider();
 
@@ -64,6 +80,15 @@ public static class Program
 
             var test5 = Task.Run(async () => await mworker.GetAsync(1, 1));
             Console.WriteLine($"Result row read: {JsonSerializer.Serialize(test5.Result)}");
+
+            var mworker2 = scope.ServiceProvider.GetRequiredService<IRepository<Moq2>>();
+            var testMoq2 = new Moq2
+            {
+                Id = 2,
+                Name = "Test Moq2",
+                Price = 2.8M,
+            };
+            mworker2.AddAsync(testMoq2);
         }
 
 
