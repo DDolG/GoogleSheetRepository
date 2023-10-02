@@ -4,7 +4,7 @@ namespace GoogleSheetRepository.Extensions
 {
     public static class PropertyExtensions
     {
-        public static object GetPropertyDescription(this PropertyInfo property)
+        public static object ConvertPropertyToHeaderCell(this PropertyInfo property)
         {
             var description = $"{property.Name}[{property.PropertyType}]";
             return (object)description;

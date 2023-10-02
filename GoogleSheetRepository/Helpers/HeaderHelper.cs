@@ -67,7 +67,7 @@ namespace GoogleSheetRepository.Helpers
             var finishRange = _properties.Count().GetColumnAddressWithHeaderShift() + Constants.HeaderPropertyNameRow;
             var range = $"{_sheetName}!{Constants.HeaderPropertyStartNameCell}:{finishRange}";
             var valueRange = new ValueRange();
-            var oblList = _properties.Select(x => x.GetPropertyDescription()).ToList();
+            var oblList = _properties.Select(x => x.ConvertPropertyToHeaderCell()).ToList();
             valueRange.Values = new List<IList<object>> { oblList };
             var updateRequest = _sheetsService.Spreadsheets.Values.Update(valueRange, _settings.SheetId, range);
             updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
