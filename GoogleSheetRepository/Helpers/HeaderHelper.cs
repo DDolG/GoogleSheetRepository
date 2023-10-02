@@ -45,7 +45,7 @@ namespace GoogleSheetRepository.Helpers
 
         public List<ColumnPropertyHeader> GetPropertyFromHeader()
         {
-            var finishRange = _properties.Count().GetFinishColumn() + Constants.HeaderPropertyNameRow;
+            var finishRange = _properties.Count().GetColumnAddressWithHeaderShift() + Constants.HeaderPropertyNameRow;
             var range = $"{_sheetName}!{Constants.HeaderPropertyStartNameCell}:{finishRange}";
             var request = _sheetsService.Spreadsheets.Values.Get(_settings.SheetId, range);
             var response = new ValueRange();
@@ -64,7 +64,7 @@ namespace GoogleSheetRepository.Helpers
 
         public void InitPropertyHeaders()
         {
-            var finishRange = _properties.Count().GetFinishColumn() + Constants.HeaderPropertyNameRow;
+            var finishRange = _properties.Count().GetColumnAddressWithHeaderShift() + Constants.HeaderPropertyNameRow;
             var range = $"{_sheetName}!{Constants.HeaderPropertyStartNameCell}:{finishRange}";
             var valueRange = new ValueRange();
             var oblList = _properties.Select(x => x.GetPropertyDescription()).ToList();

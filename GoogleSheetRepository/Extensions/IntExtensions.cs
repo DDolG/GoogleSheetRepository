@@ -2,14 +2,14 @@
 {
     public  static class IntExtensions
     {
-        public static string GetFinishColumn(this int propertyNumber)
+        public static string GetColumnAddressWithHeaderShift(this int propertyNumber)
         {
             var propertyBeginColumn = propertyNumber + Constants.BeginPropertyHeader;
             var letters = ConvertToColumnAddress(propertyBeginColumn);
             return letters.ToString();
         }
                 
-        public static string ConvertToColumnAddress(this int number)
+        private static string ConvertToColumnAddress(this int number)
         {
             var result = string.Empty;
             while((number / Constants.MaxLetterNumber > 0))

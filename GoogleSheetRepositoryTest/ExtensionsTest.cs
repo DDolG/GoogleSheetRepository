@@ -1,4 +1,5 @@
 using GoogleSheetRepository.Extensions;
+using GoogleSheetRepository.Test.TestObjects;
 
 namespace GoogleSheetRepository.Test
 {
@@ -9,14 +10,29 @@ namespace GoogleSheetRepository.Test
         {
         }
 
-        [TestCase(1,"A")]
-        [TestCase(3, "C")]
-        [TestCase(27, "AA")]
-        [TestCase(54, "BB")]
-        [TestCase(752, "ABX")]
+        [TestCase(1,"B")]
+        [TestCase(3, "D")]
+        [TestCase(27, "AB")]
+        [TestCase(54, "BC")]
+        [TestCase(752, "ABY")]
         public void ExtensionTest_GetColumnAddress(int columnNumber, string expectedAddress)
         {
-            Assert.AreEqual(expectedAddress, columnNumber.ConvertToColumnAddress());
+            Assert.AreEqual(expectedAddress, columnNumber.GetColumnAddressWithHeaderShift());
         }
+
+        [TestCaseSource(nameof(TestCondition1))]
+        public void ExtensionTest_ConvertFromObjectListPropertyToClassInstance(List<object> properties, List<object> expected)
+        {
+            var actual = properties.GetObjectFromProperty<Moq>();
+            Assert.AreEqual(expected[0], actual.Id);
+            Assert.AreEqual(expected[1], actual.Name);
+        }
+
+        private static object[] TestCondition1 = {
+           new object[] {new List<object> { "2","test" }, new List<object> { 2, "test" } },
+           new object[] {new List<object> { "3","Test" }, new List<object> { 3, "Test" } },
+           new object[] {new List<object> { "4","" }, new List<object> { 4, null } }
+        };
+
     }
 }

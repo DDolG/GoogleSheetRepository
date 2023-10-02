@@ -70,7 +70,7 @@ namespace GoogleSheetRepository
         {
             var lastRowNumber = _sheetHelper.GetLastRowNumber();
             var numberRowForSave = lastRowNumber + 1;
-            var finishRange = _properties.Count().GetFinishColumn() + numberRowForSave.ToString();
+            var finishRange = _properties.Count().GetColumnAddressWithHeaderShift() + numberRowForSave.ToString();
             var range = $"{_sheetName}!{Constants.ColumnForBeginWriteData}{numberRowForSave}:{finishRange}";
             var valueRange = new ValueRange();
             var oblList = _properties.Select(x => (object)x.GetValue(item)).ToList();
@@ -100,7 +100,7 @@ namespace GoogleSheetRepository
         public List<T> Get()
         {
             var lastRow = _sheetHelper.GetLastRowNumber();
-            var finishRange = _properties.Count().GetFinishColumn() + lastRow.ToString();
+            var finishRange = _properties.Count().GetColumnAddressWithHeaderShift() + lastRow.ToString();
             var range = $"{_sheetName}!{Constants.ColumnForBeginWriteData}{Constants.RowForBeginWriteData}:{finishRange}";
             var request = _sheetsService.Spreadsheets.Values.Get(_settings.SheetId, range);
             var response = new ValueRange();
@@ -127,7 +127,7 @@ namespace GoogleSheetRepository
             var lastRow = _sheetHelper.GetLastRowNumber();
             var beginData = skip > lastRow ? lastRow : skip;
             var endData = (skip + take) > lastRow ? lastRow : (skip + take - 1);
-            var finishRange = _properties.Count().GetFinishColumn() + endData.ToString();
+            var finishRange = _properties.Count().GetColumnAddressWithHeaderShift() + endData.ToString();
             var range = $"{_sheetName}!{Constants.ColumnForBeginWriteData}{beginData}:{finishRange}";
             var request = _sheetsService.Spreadsheets.Values.Get(_settings.SheetId, range);
             var response = new ValueRange();
@@ -185,7 +185,7 @@ namespace GoogleSheetRepository
 
         private bool UpdateRow(int rowNumber, T item)
         {
-            var finishRange = _properties.Count().GetFinishColumn() + rowNumber.ToString();
+            var finishRange = _properties.Count().GetColumnAddressWithHeaderShift() + rowNumber.ToString();
             var range = $"{_sheetName}!{Constants.ColumnForBeginWriteData}{rowNumber}:{finishRange}";
             var valueRange = new ValueRange();
             var oblList = _properties.Select(x => (object)x.GetValue(item)).ToList();
