@@ -46,7 +46,8 @@ namespace GoogleSheetRepository.Test
 
         private static object[] TestConditionObjecToHeaderColumn = {
            new object[] {"Id[System.Int32]", new List<object> { "Id", "System.Int32" } },
-           new object[] { "Name[System.String]", new List<object> { "Name", "System.String" } }
+           new object[] { "Name[System.String]", new List<object> { "Name", "System.String" } },
+           new object[] { "CategoryId[System.Nullable`1[System.Int32]]", new List<object> { "CategoryId", "System.Nullable`1[System.Int32]" } }
         };
 
         [TestCaseSource(nameof(TestConditionPropertyToHeaderCell))]
@@ -58,7 +59,8 @@ namespace GoogleSheetRepository.Test
 
         private static object[] TestConditionPropertyToHeaderCell = {
            new object[] {typeof(Moq).GetProperty("Id"),"Id[System.Int32]"},
-           new object[] {typeof(Moq).GetProperty("Name"),"Name[System.String]"}
+           new object[] {typeof(Moq).GetProperty("Name"),"Name[System.String]"},
+           new object[] {typeof(Moq).GetProperty("CategoryId"), "CategoryId[System.Nullable`1[System.Int32]]" }
         };
     }
 }

@@ -17,7 +17,7 @@ namespace GoogleSheetRepository.Extensions
             {
                 throw new ArgumentException($"Can not get property name from {header}");
             }
-            match = Regex.Match(header, @"\[(.*?)\]");
+            match = Regex.Match(header, @"\[(.*?)\]$");
             var typeOfProperty = string.Empty;
             if (match.Success)
             {

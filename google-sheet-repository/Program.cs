@@ -1,12 +1,11 @@
 ﻿using GoogleSheetRepository;
-using GoogleSheetRepository.Helpers;
 using GoogleSheetRepository.Interfaces;
 using GoogleSheetRepository.Models;
 using GoogleSheetRepository.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics;
 using System.Text.Json;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Repository;
 
@@ -36,6 +35,34 @@ public class Moq2 : IEquatable<Moq2>
     }
 }
 
+public class Product : IEquatable<Product>
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public decimal Price { get; set; }
+    
+    public int CategoryId { get; set; }
+
+    public bool Equals(Product? other)
+    {
+        return Id == other.Id && Name == other.Name 
+            && Price == other.Price && CategoryId == other.CategoryId;
+    }
+}
+
+public class Category : IEquatable<Category>
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+
+    public int? ParentCategoryId {  get; set; }
+
+    public bool Equals(Category? other)
+    {
+        return Id == other.Id && Name == other.Name && ParentCategoryId == other.ParentCategoryId;
+    }
+}
+
 
 public static class Program
 {
@@ -50,8 +77,8 @@ public static class Program
 
         var settings = new GoogleSheetSettings(); 
         serviceCollection.AddScoped<ISettings, Settings>();
-        serviceCollection.AddScoped<IRepository<Moq>, Repository<Moq>>();
-        serviceCollection.AddScoped<IRepository<Moq2>, Repository<Moq2>>();
+        serviceCollection.AddScoped<IRepository<Product>, Repository<Product>>();
+        serviceCollection.AddScoped<IRepository<Category>, Repository<Category>>();
 
         var serviceProvider = serviceCollection.BuildServiceProvider();
 
@@ -59,13 +86,32 @@ public static class Program
         {
             var myService = scope.ServiceProvider.GetRequiredService<ISettings>();
             var test = myService.GetSettings();
-            var mworker = scope.ServiceProvider.GetRequiredService<IRepository<Moq>>();
-            var testMoq = new Moq
+            var productWorker = scope.ServiceProvider.GetRequiredService<IRepository<Product>>();
+            var categoryWorker = scope.ServiceProvider.GetRequiredService<IRepository<Category>>();
+            var apple = new Product
+            {
+                Id = 1,
+                Name = "Apple",
+                CategoryId = 1,
+                Price = 3.89M
+            };
+            productWorker.Add(apple);
+
+            var fruit = new Category
+            {
+                Id = 1,
+                Name = "Fruit",
+                ParentCategoryId = 2
+            };
+            categoryWorker.Add(fruit);
+
+            var food = new Category
             {
                 Id = 2,
-                Name = "Test1"
+                Name = "Food"
             };
-            
+            categoryWorker.Add(food);
+            /*
             var test2 = mworker.Get();            
             var updateOld = test2.First();
             var updateTestObject = new Moq();
@@ -74,9 +120,6 @@ public static class Program
 
             var test3 = mworker.Update(updateOld, updateTestObject);
             Console.WriteLine($"Result update value: {test3}");
-
-            //var test4 = Task.Run(async () => await mworker.DeleteAsync(test2.Result[2]));
-            //Console.WriteLine($"Result delete row: {test4.Result}");
 
             var test5 =  mworker.Get(1, 1);
             Console.WriteLine($"Result row read: {JsonSerializer.Serialize(test5)}");
@@ -88,7 +131,7 @@ public static class Program
                 Name = "Test Moq2",
                 Price = 2.8M,
             };
-            mworker2.Add(testMoq2);
+            mworker2.Add(testMoq2);*/
         }
 
 
