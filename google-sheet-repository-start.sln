@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleSheetRepository", "Go
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleSheetRepository.Test", "GoogleSheetRepositoryTest\GoogleSheetRepository.Test.csproj", "{54BE3201-9D81-4C91-9238-27B34F79549E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GppgleSheetRepository.Sample", "GppgleSheetRepository.Sample\GppgleSheetRepository.Sample.csproj", "{C6A6F43C-9DA1-4DAE-A38C-6E92826E2C16}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{54BE3201-9D81-4C91-9238-27B34F79549E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{54BE3201-9D81-4C91-9238-27B34F79549E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{54BE3201-9D81-4C91-9238-27B34F79549E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6A6F43C-9DA1-4DAE-A38C-6E92826E2C16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6A6F43C-9DA1-4DAE-A38C-6E92826E2C16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6A6F43C-9DA1-4DAE-A38C-6E92826E2C16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6A6F43C-9DA1-4DAE-A38C-6E92826E2C16}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

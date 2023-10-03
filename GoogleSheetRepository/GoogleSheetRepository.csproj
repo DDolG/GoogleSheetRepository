@@ -4,7 +4,28 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Title>google-sheet-repository</Title>
+    <Authors>DolG</Authors>
+    <Company>DolG</Company>
+    <Product>google-sheet-repository</Product>
+    <Description>Allows execute CRUD operation in google sheet without having to have knowledge on the Google Sheets API methods and protocols.</Description>
+    <RepositoryUrl>https://github.com/DDolG/google-sheet-repository</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReleaseNotes>base version</PackageReleaseNotes>
+    <PackageTags>googlesheet repository crud sheet</PackageTags>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Copyright>MIT</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Google.Apis.Sheets.v4" Version="1.62.0.3148" />

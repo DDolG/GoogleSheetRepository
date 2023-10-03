@@ -1,11 +1,8 @@
 ﻿using GoogleSheetRepository;
 using GoogleSheetRepository.Interfaces;
-using GoogleSheetRepository.Models;
 using GoogleSheetRepository.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Diagnostics;
-using System.Text.Json;
 
 namespace Repository;
 
@@ -75,7 +72,7 @@ public static class Program
             .Build();
         serviceCollection.AddSingleton<IConfiguration>(configuration);
 
-        var settings = new GoogleSheetSettings(); 
+        //var settings = new GoogleSheetSettings(); 
         serviceCollection.AddScoped<ISettings, Settings>();
         serviceCollection.AddScoped<IRepository<Product>, Repository<Product>>();
         serviceCollection.AddScoped<IRepository<Category>, Repository<Category>>();
@@ -95,22 +92,24 @@ public static class Program
                 CategoryId = 1,
                 Price = 3.89M
             };
-            productWorker.Add(apple);
-
+            
             var fruit = new Category
             {
                 Id = 1,
                 Name = "Fruit",
                 ParentCategoryId = 2
             };
-            categoryWorker.Add(fruit);
 
             var food = new Category
             {
                 Id = 2,
                 Name = "Food"
             };
+
+            productWorker.Add(apple);
+            categoryWorker.Add(fruit);
             categoryWorker.Add(food);
+            
             /*
             var test2 = mworker.Get();            
             var updateOld = test2.First();
