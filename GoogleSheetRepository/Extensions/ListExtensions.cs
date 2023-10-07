@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.ComponentModel;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace GoogleSheetRepository.Extensions;
@@ -12,12 +13,23 @@ public static class ListExtensions
         var countProperties = 0;
         foreach ( var property in properties)
         {
-            var rowCell = objects[countProperties++];
+            object? rowCell;
+            try
+            {
+                rowCell = objects[countProperties++];
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error when get cell from row {ex.Message}");
+                continue;
+            }
+
             if (rowCell is string str && !string.IsNullOrEmpty(str))
             {
                 try
                 {
-                    dynamic value = Convert.ChangeType(rowCell, property.PropertyType);
+                    var conv = TypeDescriptor.GetConverter(property.PropertyType);
+                    dynamic value = conv.ConvertFrom(rowCell);
                     property.SetValue(result, value);
                 }
                 catch (Exception ex)
