@@ -14,6 +14,8 @@ builder.Services.AddSingleton<IConfiguration>(configuration);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddControllers()
+                .AddNewtonsoftJson();
 
 builder.Services.AddSingleton<ISettings, Settings>();
 builder.Services.AddSingleton<IRepository<Product>, Repository<Product>>();
@@ -27,33 +29,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.MapGet("/products", (IRepository<Product> repository) =>
-{
-    return repository.Get();
-})
-.WithName("products")
-.WithOpenApi();
+app.MapControllers();
 
-/*TODO Error! check*/
 app.MapGet("/categories", (IRepository<Category> repository) =>
 {
     return Results.Ok(repository.Get());
 })
 .WithName("categories")
 .WithOpenApi();
-
-app.MapPost("/add/product", async (IRepository<Product> repository, HttpContext context) =>
-{
-    var request = context.Request;
-    var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-    var data = JsonSerializer.Deserialize<Product>(requestBody);
-    repository.Add(data);
-    return Results.Ok(data);
-})
-.WithName("add-product")
-.WithOpenApi();
-
-
-
 
 app.Run();
