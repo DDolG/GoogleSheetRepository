@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
+            .AddUserSecrets<Program>()
             .AddJsonFile("appsettings.json")
             .Build();
 builder.Services.AddSingleton<IConfiguration>(configuration);

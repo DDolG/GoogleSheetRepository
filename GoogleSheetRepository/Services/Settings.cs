@@ -24,7 +24,7 @@ namespace GoogleSheetRepository.Services
             {
                 SheetName = _configuration["GoogleSheetSettings:SheetName"],
                 FCredencialFile = _configuration["GoogleSheetSettings:FCredencialFile"],
-                SheetId = _configuration["GoogleSheetSettings:SheetId"]
+                SheetId = _configuration["SheetId"]
             };
             
             using (var stream = new FileStream(_settings.FCredencialFile, FileMode.Open, FileAccess.Read))
