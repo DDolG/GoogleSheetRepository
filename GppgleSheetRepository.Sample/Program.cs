@@ -2,7 +2,6 @@ using GoogleSheetRepository;
 using GoogleSheetRepository.Interfaces;
 using GoogleSheetRepository.Services;
 using GppgleSheetRepository.Sample.Models;
-using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,12 +29,4 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
-
-app.MapGet("/categories", (IRepository<Category> repository) =>
-{
-    return Results.Ok(repository.Get());
-})
-.WithName("categories")
-.WithOpenApi();
-
 app.Run();
