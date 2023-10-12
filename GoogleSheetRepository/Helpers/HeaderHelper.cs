@@ -24,6 +24,10 @@ namespace GoogleSheetRepository.Helpers
             _properties = properties;
         }
 
+        /// <summary>
+        /// Get the number of properties recorded in the table
+        /// </summary>
+        /// <returns></returns>
         public int? GetPropertyCountFromPage()
         {
             var range = $"{_sheetName}!{Constants.NumberOfPropertyCell}";
@@ -43,7 +47,11 @@ namespace GoogleSheetRepository.Helpers
             return countClassProperties;
         }
 
-        public List<ColumnPropertyHeader> GetPropertyFromHeader()
+        /// <summary>
+        /// Get a list of properties from the table header
+        /// </summary>
+        /// <returns></returns>
+        public List<ColumnPropertyHeader> GetPropertiesFromHeader()
         {
             var finishRange = _properties.Count().GetColumnAddressWithHeaderShift() + Constants.HeaderPropertyNameRow;
             var range = $"{_sheetName}!{Constants.HeaderPropertyStartNameCell}:{finishRange}";
@@ -62,6 +70,10 @@ namespace GoogleSheetRepository.Helpers
             return result;
         }
 
+        /// <summary>
+        /// Initializing property column headers
+        /// </summary>
+        /// <returns></returns>
         public void InitPropertyHeaders()
         {
             var finishRange = _properties.Count().GetColumnAddressWithHeaderShift() + Constants.HeaderPropertyNameRow;
@@ -83,6 +95,10 @@ namespace GoogleSheetRepository.Helpers
             Console.WriteLine($"Write count property response: {appendReponse.ToString()}");
         }
 
+        /// <summary>
+        /// Storing the number of properties in the table header
+        /// </summary>
+        /// <returns></returns>
         public void SetPropertyCount()
         {
             var range = $"{_sheetName}!{Constants.NumberOfPropertyCell}";

@@ -5,6 +5,10 @@ namespace GoogleSheetRepository.Extensions
 {
     public static class ObjectExtensions
     {
+        /// <summary>
+        /// Fills the table header with the property name and type
+        /// </summary>
+        /// <returns></returns>
         public static ColumnPropertyHeader GetColumnProperty(this object headerCell)
         {
             var header = headerCell as string;

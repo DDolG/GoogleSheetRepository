@@ -19,16 +19,28 @@ namespace GoogleSheetRepository.Helpers
             _sheetName = sheetName;
         }
 
+        /// <summary>
+        /// Create a table
+        /// </summary>
+        /// <returns></returns>
         public void Create()
         {
             AddSheet();
         }
 
+        /// <summary>
+        /// Check have a page
+        /// </summary>
+        /// <returns></returns>
         public bool HavePage()
         {
             return CanReadSheet();
         }
 
+        /// <summary>
+        /// Get page id number
+        /// </summary>
+        /// <returns></returns>
         public int GetSheetId()
         {
             var spreadsheet = _sheetsService.Spreadsheets.Get(_settings.SheetId).Execute();
@@ -41,6 +53,10 @@ namespace GoogleSheetRepository.Helpers
             throw new InvalidOperationException($"Sheet '{_sheetName}' not found in the spreadsheet.");
         }
 
+        /// <summary>
+        /// Get number of last row in table
+        /// </summary>
+        /// <returns></returns>
         public int? GetLastRowNumber()
         {
             var range = $"{_sheetName}!{Constants.ColumnForSearchLastRecord}";
@@ -59,6 +75,10 @@ namespace GoogleSheetRepository.Helpers
             return result;
         }
 
+        /// <summary>
+        /// Add table to google sheet
+        /// </summary>
+        /// <returns></returns>
         private void AddSheet()
         {
             var request = new Request
@@ -85,6 +105,10 @@ namespace GoogleSheetRepository.Helpers
             }
         }
 
+        /// <summary>
+        /// Is it possible to read the table
+        /// </summary>
+        /// <returns></returns>
         private bool CanReadSheet()
         {
             var range = $"{_sheetName}!A1";

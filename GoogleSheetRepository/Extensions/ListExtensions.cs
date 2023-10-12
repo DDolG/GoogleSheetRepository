@@ -6,6 +6,10 @@ namespace GoogleSheetRepository.Extensions;
 
 public static class ListExtensions 
 {
+    /// <summary>
+    /// Fills the properties of a class with a list of objects
+    /// </summary>
+    /// <returns></returns>
     public static T GetObjectFromProperty<T>(this List<object> objects) where T : class, new()
     {
         var result = new T();

@@ -51,7 +51,7 @@ namespace GoogleSheetRepository
             }
 
             //check column by name
-            var headerProperties = _headerHelper.GetPropertyFromHeader();
+            var headerProperties = _headerHelper.GetPropertiesFromHeader();
             var objectProperties = _properties.Select(x => new ColumnPropertyHeader
             {
                 Name = x.Name,

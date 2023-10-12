@@ -24,9 +24,12 @@ namespace GoogleSheetRepository.Services
             {
                 SheetName = _configuration["GoogleSheetSettings:SheetName"],
                 FCredencialFile = _configuration["GoogleSheetSettings:FCredencialFile"],
-                SheetId = _configuration["SheetId"]
+                SheetId = _configuration["GoogleSheetSettings:SheetId"]
             };
-            
+
+            var sheetIdFromSecret = _configuration["SheetId"];
+            if (sheetIdFromSecret != null) _settings.SheetId = sheetIdFromSecret;
+
             using (var stream = new FileStream(_settings.FCredencialFile, FileMode.Open, FileAccess.Read))
             {
                 _credential = GoogleCredential.FromStream(stream)

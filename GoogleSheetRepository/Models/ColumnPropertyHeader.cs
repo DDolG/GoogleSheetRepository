@@ -1,5 +1,8 @@
 ﻿namespace GoogleSheetRepository.Models
 {
+    /// <summary>
+    /// Table header object
+    /// </summary>
     public class ColumnPropertyHeader : IEquatable<ColumnPropertyHeader>
     {
         public string Name { get; set; }
